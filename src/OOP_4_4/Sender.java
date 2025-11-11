@@ -13,7 +13,7 @@ public class Sender {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
         InetAddress address = InetAddress.getLocalHost();
-        int port = 55555;
+        int port = 4444;
         DatagramSocket socket = new DatagramSocket();
         String msgCity;
         String msgTemp;
