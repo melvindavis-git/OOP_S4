@@ -6,7 +6,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.*;
 
 import static java.awt.Font.BOLD;
 
@@ -28,6 +27,19 @@ public class GUI extends JFrame {
     private Color fg = Color.BLACK;
     private JPanel panelTop = new JPanel();
 
+    private String message;
+
+    public String getMessage() {
+        return message + "\n";
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getUsername() {
+        return username;
+    }
 
     public GUI() throws IOException {
 
@@ -53,18 +65,6 @@ public class GUI extends JFrame {
         panelTop.setBackground(bg);
         panelTop.add(themeBtn);
 
-        Client client = new Client();
-
-        textField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    client.setFromUser(textField.getText());
-                    textField.setText("");
-                }
-            }
-        });
-
         themeBtn.addActionListener(e -> darkLightToggle());
 
         frame.setVisible(true);
@@ -75,7 +75,21 @@ public class GUI extends JFrame {
         textField.requestFocus();
 
         nameWindow();
+        Client client = new Client(this);
 
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    message = textField.getText();
+                    if (message.trim().isEmpty()) return;
+
+                    textField.setText("");
+                    client.sendMessageToServer(username + ": " + message);
+                }
+            }
+        });
     }
 
     private void nameWindow() {
@@ -103,7 +117,7 @@ public class GUI extends JFrame {
                         nameFrame.dispose();
                         frame.toFront();
                         frame.setEnabled(true);
-                        textAreaList.setText(username + "\n");
+                        updateUserList(username);
                     }
                 }
             }
@@ -142,16 +156,26 @@ public class GUI extends JFrame {
         themeBtn.setForeground(fg);
     }
 
+    public void setTextArea(String message) {
+        textArea.append(message + "\n");
+        updateUserList(message);
+    }
+
     private void updateUserList(String msg) {
-        if (!msg.contains(":")) return;
+        if (!msg.contains(":")) {
+            if (!textAreaList.getText().contains(msg + "\n")) {
+                textAreaList.append(msg + "\n");
+            }
+            return;
+        }
+
         String name = msg.split(":", 2)[0].trim();
-        if (!textAreaList.getText().contains(name)) {
+        if (!textAreaList.getText().contains(name + "\n")) {
             textAreaList.append(name + "\n");
         }
     }
 
     static void main() throws IOException {
-        new GUI();
+        GUI gui = new GUI();
     }
-
 }

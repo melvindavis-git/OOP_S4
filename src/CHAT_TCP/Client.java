@@ -5,29 +5,29 @@ import java.net.Socket;
 
 public class Client {
 
-    private String fromUser;
-    private String fromServer;
+    private PrintWriter out;
+    private BufferedReader in;
 
-    public Client() {
+    public Client(GUI gui) throws IOException {
 
+        Socket socket = new Socket("172.20.207.203", 4444);
+        out = new PrintWriter(socket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        try (Socket socket = new Socket("localhost", 55555)) {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-
-            while ((fromServer = in.readLine()) != null) {
-                out.println(fromUser);
-                fromServer = in.readLine();
-                System.out.println(fromServer);
+        new Thread(() -> {
+            try {
+                String fromServer;
+                while ((fromServer = in.readLine()) != null) {
+                    gui.setTextArea(fromServer);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
-    public void setFromUser(String fromUser) {
-        this.fromUser = fromUser;
+    public void sendMessageToServer(String msg) {
+        out.println(msg);
     }
+
 }

@@ -8,9 +8,9 @@ public class ServerListener {
 
     public ServerListener() {
 
-        try (ServerSocket ss = new ServerSocket(55555)) {
+        String s = "Listening for servers";
 
-            String s = "Listening for servers";
+        try (ServerSocket ss = new ServerSocket(4444)) {
 
 
             Thread loadingThread = new Thread(() -> {
